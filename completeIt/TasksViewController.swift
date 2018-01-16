@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  TasksViewController.swift
 //  completeIt
 //
 //  Created by Daniel Debner on 1/15/18.
@@ -8,11 +8,12 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
 	@IBOutlet weak var taskTable: UITableView!
 	
 	var tasks : [Task] = []
+	var selectedIndex = 0
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -41,6 +42,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 		return cell
 	}
 	
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		
+		selectedIndex = indexPath.row
+		
+		let task = tasks[indexPath.row]
+		performSegue(withIdentifier: "selectTaskSegue", sender: task)
+	}
+	
 	func makeTasks() -> [Task] {
 		let task1 = Task()
 		task1.name = "Walk the dog"
@@ -57,9 +66,22 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 		return [task1, task2, task3]
 	}
 	
-	@IBAction func addTask(_ sender: Any) {
-		performSegue(withIdentifier: "addSegue", sender: nil)
+	@IBAction func plusTapped(_ sender: Any) {
+		performSegue(withIdentifier: "plusSegue", sender: nil)
+	}
+	
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		if segue.identifier == "plusSegue" {
+		let nextVC = segue.destination as! CreateTaskViewController // 'as!' specifies the exact view controller, we know that previous.VC is a var on the CTVC
+		nextVC.previousVC = self
+		}
+		
+		if segue.identifier == "selectTaskSegue" {
+			let nextVC = segue.destination as! CompleteTaskViewController
+			nextVC.task = sender as! Task
+			nextVC.previousVC = self
 	}
 	
 }
 
+}
